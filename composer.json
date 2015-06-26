@@ -1,6 +1,7 @@
 { 
     "require": 
     { 
-        "phroute/phroute": "1.*" 
+        "phroute/phroute": "1.*",
+        "league/flysystem": "^1.0"
     } 
 }

@@ -13,19 +13,43 @@ if ($debug) {
 	ini_set('display_errors', 1);
 	error_reporting(E_ALL);
 }
+
 /**
  * Require autoload
  */
 require 'vendor/autoload.php';
  
+/**
+ * The router
+ * @var Phroute
+ */
 $router = new Phroute\RouteCollector();
 
 /**
- * Define main route
+ * Filters
  */
-$router->get('/', function() {
-	// Add this to class
-	return 'Main admin page';
+$router->filter('auth', function() {
+	// if (!isset($_SESSION['user'])) {
+	// 	header('Location: /login');
+
+	// 	return false;
+	// }
+});
+
+/**
+ * Define routes
+ */
+$router->group(array('before' => 'auth'), function($router) {
+	$router->get('/', function() {
+		// Add this to controller
+		return 'Main admin page';
+	});
+});
+
+// Login route
+$router->get('/login', function() {
+	// Add this to controller
+	return 'Auth the user here';
 });
 
 
