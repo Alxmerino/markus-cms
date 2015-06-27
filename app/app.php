@@ -1,7 +1,6 @@
 <?php
 
 use Markus\Routes\Routes;
-use Markus\Routes\Filters;
 
 /**
  * Vars

@@ -6,8 +6,16 @@
 class AuthFilter
 {
 	
-	function __construct()
+	function __construct($router)
 	{
-		echo __CLASS__ . "<br>";
+		$router->filter('auth', function() {
+			if (!isset($_SESSION['user'])) {
+				header('Location: /login');
+
+				return false;
+			}
+		});
+
+		return $router;
 	}
 }

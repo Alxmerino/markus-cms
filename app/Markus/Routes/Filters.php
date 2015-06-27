@@ -6,8 +6,12 @@
 class Filters
 {
 	
-	function __construct()
+	function __construct($router)
 	{
-		echo __CLASS__ . "<br>";
+		$router->filter('auth', function() {
+			// 
+		});
+
+		return $router;
 	}
 }

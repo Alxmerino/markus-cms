@@ -7,4 +7,4 @@ require __DIR__ . '/app/app.php';
 | Start Markus
 |--------------------------------------------------------------------------
 */
-$app = new MarkusCMS();
+new MarkusCMS();

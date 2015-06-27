@@ -1,6 +1,7 @@
 <?php 
 
 namespace Markus\Routes;
+use Markus\Filters\AuthFilter;
 use Phroute\RouteCollector as Phrouter;
 use Phroute\Dispatcher as Dispatcher;
 
@@ -9,21 +10,39 @@ use Phroute\Dispatcher as Dispatcher;
 */
 class Routes
 {
-	// Vars
+	// @var Phroute
 	public $router;
+	// @var Dispatcher
 	public $dispatcher;
+	// @var Filters
+	public $filters;
 	
 	function __construct()
 	{
 		$this->router = $this->routes(new Phrouter());
+		$this->filters = new AuthFilter($this->router);
 		$this->dispatcher = new Dispatcher($this->router);
 		$this->serveResponse($this->dispatcher);
 	}
 
+	/**
+	 * Define all routes
+	 * @param  @var $router Phrouter instance
+	 * @return @var return all routes
+	 */
 	function routes($router)
 	{
-		$router->get('/', function() {
-			return 'Hello World';
+
+		$router->get('/login', function() {
+			return "You must login to proceed";
+		});
+
+		$router->group(array('before' => 'auth'), function($router) {
+
+			$router->get('/', function() {
+				return 'Hello Admin';
+			});
+			// $router->controller('/', 'FileController');
 		});
 
 		// Return the router
