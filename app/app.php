@@ -29,7 +29,6 @@ class MarkusCMS
 	{
 		// TODO: Call Classes here
 		new Routes();
-		new Filters();
 	}
 
 }
