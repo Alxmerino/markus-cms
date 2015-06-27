@@ -1,4 +1,6 @@
-<?php namespace Markus\Filters;
+<?php 
+
+namespace Markus\Filters;
 
 /**
 * Auth Filter

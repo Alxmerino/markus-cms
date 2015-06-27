@@ -1,9 +1,9 @@
 <?php 
 
-namespace Markus\Routes;
+namespace Markus\Files;
 
 /**
-* Handle Routes
+* Handle File system
 */
 class Files
 {

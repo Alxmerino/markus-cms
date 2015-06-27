@@ -9,9 +9,9 @@ $debug = 1;
 
 /**
  * Turn debugging on
+ * error reporting
  */
 if ($debug) {
-	// error reporting
 	ini_set('display_errors', 1);
 	error_reporting(E_ALL);
 }
