@@ -4,10 +4,5 @@
         "phroute/phroute": "1.*",
         "league/flysystem": "^1.0",
         "twig/twig": "~1.0"
-    },
-    "autoload": {
-    	"psr-4": {
-            "Markus\\": "app/Markus"
-        }
     }
 }
