@@ -43,19 +43,38 @@ class Routes
 			return "You must login to proceed";
 		});
 
-		// Main route
+		// Main routes group
 		$router->group(array('before' => 'auth'), function($router) {
 
+			// Files list
 			$router->get('/', function() {
+
+				$outputHTML = '<ul>';
 				
 				/* Get config data */
 				$this->config = $this->getConfig();
-				$contents = $this->filesystem->listContents($this->config->app_path);
-				echo '<pre>';
-	print_r($contents);
-echo '</pre>';
+				$appContents = $this->filesystem->listContents($this->config->app_path);
+
+				foreach ($appContents as $key => $value) {
+					$outputHTML .= '<li>';
+					$outputHTML .= $value['basename'];
+					$outputHTML .= ' <a href="edit/';
+					$outputHTML .= $value['basename'];
+					$outputHTML .= '">Edit</a></li>';
+				}
+
+				$outputHTML .= '</ul>';
+
+				return $outputHTML;
+
 			});
-			// $router->controller('/', 'FileController');
+
+			$router->get('/edit/{filename:c}', function($filename) {
+				$path = $this->getConfig()->app_path;
+				$fileContents = $this->filesystem->read($path . '/' . $filename);
+				
+				return $fileContents;
+			});
 		});
 
 		// Return the router
