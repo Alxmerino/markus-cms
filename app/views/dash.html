@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+	<section id="dash">
+		<h1>Files list</h1>
+		<table>
+			<thead>
+				<tr>
+					<th>File Name</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for file in data %}
+					<tr>
+						<td>
+							<h4 class="name">{{ file.basename }}</h4>
+							<div class="path">{{ file.path }}</div>
+						</td>
+						<td>
+							<ul class="icons">
+								<li><a title="Edit" href="/edit/{{ file.basename }}" class="icon fa-pencil-square-o"><span class="label">Edit</span></a></li>
+								<li><a title="Delete" href="/delete/{{ file.basename }}" class="icon fa-trash-o"><span class="label">Delte</span></a></li>
+							</ul>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
+    
+{% endblock %}
