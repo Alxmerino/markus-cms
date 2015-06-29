@@ -83,11 +83,31 @@ class MarkusCMS
 			});
 
 			$router->get('/edit/{filename:c}', function($filename) {
-				$path = $this->config->app_path;
-				$fileContents = $this->filesystem->read($path . '/' . $filename);
-				
-				return $fileContents;
+
+				$data = array();
+				$data['filename'] = $filename;
+				$data['content'] = $this->filesystem->read($this->config->app_path . '/' . $filename);
+				$data['markus'] = $this->objToArray($this->config->settings);
+					
+				return $this->twig->render('edit.html', $data);
 			});
+
+			$router->post('/edit', function() {
+				$path = $this->config->app_path . '/';
+				$old_file = $_POST['old_file'];
+				$filename = $_POST['filename'];
+				$contents = $_POST['contents'];
+
+				// Rename file if it doesnt exist
+				if ( $old_file != $filename ) {
+					$this->filesystem->rename($path . $old_file, $path . $filename);
+				}
+
+				// Update it's contents
+				$this->filesystem->update($path . $filename, $contents);
+
+			});
+
 		});
 
 		// Return the router

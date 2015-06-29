@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ filename }}{% endblock %}
+
+{% block content %}
+
+	<section id="edit">
+		<h1>Edit "{{ filename }}"</h1>
+
+		<form method="post" action="/edit">
+			<input type="hidden" name="old_file" value="{{ filename }}">
+			<div class="row uniform 50%">
+				<div class="12u$ 12u$(xsmall) name">
+					<input type="text" name="filename" id="filename" value="{{ filename }}" />
+					<label for="filename">File name</label>
+				</div>
+				
+				<div class="12u$">
+					<textarea name="contents" id="" rows="15">
+{{ content }}
+					</textarea>
+				</div>
+
+				<div class="12u$">
+					<ul class="actions">
+						<li><input type="submit" class="special" value="Submit" /></li>
+					</ul>
+				</div>
+			</div>
+		</form>
+	</section>
+    
+{% endblock %}
