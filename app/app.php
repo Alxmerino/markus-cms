@@ -23,6 +23,7 @@ if ($debug) {
  * Require autoload and dependencies
  */
 require_once __DIR__ .'/../vendor/autoload.php';
+require_once __DIR__ .'/helper-classes/Spyc.php';
 
 class MarkusCMS
 {
@@ -36,11 +37,15 @@ class MarkusCMS
 	private $config;
 	// Twig instance
 	private $twig;
+	// YAML Parser
+	private $yml;
 	
 	function __construct()
 	{
 		$this->filesystem = new Filesystem(new Adapter($_SERVER['DOCUMENT_ROOT']));
 		$this->config = $this->getConfig();
+
+		$this->yml = 
 		
 		Twig_Autoloader::register();
 		$loader = new Twig_Loader_Filesystem($_SERVER['DOCUMENT_ROOT'] . '/app/views');
@@ -83,10 +88,26 @@ class MarkusCMS
 			});
 
 			$router->get('/edit/{filename:c}', function($filename) {
-
+				// File Data
 				$data = array();
-				$data['filename'] = $filename;
-				$data['content'] = $this->filesystem->read($this->config->app_path . '/' . $filename);
+				$markdownExtensions = array("mark", "markdown", "md", "mdml", "mdown", "mdtext", "mdtxt", "mdwn", "mkd", "mkdn");
+				$yamlExtensions = array("yaml", "yml");
+
+				// File contents
+				$fileContents = $this->filesystem->read($this->config->app_path . '/' . $filename);
+
+				// Get file info
+				$fileInfo = pathinfo($this->config->app_path . '/' . $filename);
+	
+				if ( in_array($fileInfo['extension'], $markdownExtensions) !== FALSE
+					|| in_array($fileInfo['extension'], $yamlExtensions) !== FALSE ) {
+					echo '<pre>';
+					print_r(Spyc::YAMLLoad($fileContents));
+					echo '</pre>';
+				} else {
+					$data['filename'] = $filename;
+					$data['content'] = $fileContents;
+				}
 				$data['markus'] = $this->objToArray($this->config->settings);
 					
 				return $this->twig->render('edit.html', $data);
