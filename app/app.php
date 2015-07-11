@@ -4,6 +4,7 @@ use Phroute\RouteCollector as Phrouter;
 use Phroute\Dispatcher as Dispatcher;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local as Adapter;
+use Symfony\Component\Yaml\Parser;
 
 /**
  * Vars
@@ -42,17 +43,29 @@ class MarkusCMS
 	
 	function __construct()
 	{
+		/**
+		 * File System and config
+		 */
 		$this->filesystem = new Filesystem(new Adapter($_SERVER['DOCUMENT_ROOT']));
 		$this->config = $this->getConfig();
 
-		$this->yml = 
+		/**
+		 * YAML Parser
+		 */
+		$this->yml = new Parser();
 		
+		/**
+		 * Templating Engine
+		 */
 		Twig_Autoloader::register();
 		$loader = new Twig_Loader_Filesystem($_SERVER['DOCUMENT_ROOT'] . '/app/views');
 		$this->twig = new Twig_Environment($loader, array(
 			'debug' => true
 		));
 
+		/**
+		 * Router
+		 */
 		$this->router = $this->routes(new Phrouter());
 		$this->filters($this->router);
 		$this->dispatcher = new Dispatcher($this->router);
@@ -101,9 +114,15 @@ class MarkusCMS
 	
 				if ( in_array($fileInfo['extension'], $markdownExtensions) !== FALSE
 					|| in_array($fileInfo['extension'], $yamlExtensions) !== FALSE ) {
-					echo '<pre>';
-					print_r(Spyc::YAMLLoad($fileContents));
-					echo '</pre>';
+
+					try {
+						echo '<pre>';
+						print_r($this->yml->parse($fileContents));
+						echo '</pre>';
+					} catch (ParseException $e) {
+						printf("Unable to parse the YAML string: %s", $e->getMessage());
+					}
+
 				} else {
 					$data['filename'] = $filename;
 					$data['content'] = $fileContents;
@@ -157,7 +176,8 @@ class MarkusCMS
 		echo $response;
 	}
 
-	function objToArray($obj) {
+	function objToArray($obj)
+	{
 		if (is_object($obj)) {
 			// Gets the properties of the given object
 			// with get_object_vars function
@@ -171,14 +191,14 @@ class MarkusCMS
 			* for recursive call
 			*/
 			return array_map(__METHOD__, $obj);
-		}
-		else {
+		} else {
 			// Return array
 			return $obj;
 		}
 	}
 
-	private function arrayToObject($array) {
+	private function arrayToObject($array)
+	{
 		if (is_array($array)) {
 			/*
 			* Return array converted to object
