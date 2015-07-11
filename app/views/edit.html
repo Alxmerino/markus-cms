@@ -18,7 +18,7 @@
 				{% if fields %}
 					{% for key, value in fields %}					
 						<div class="12u$ 12u$(xsmall) name">
-							<input type="text" name="{{ key }}" id="{{ key }}" value="{{ value }}" />
+							<input type="text" name="fields[{{ key }}]" id="{{ key }}" value="{{ value }}" />
 							<label for="{{ key }}">{{ key|capitalize }}</label>
 						</div>
 					{% endfor %}

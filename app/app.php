@@ -6,6 +6,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local as Adapter;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Dumper;
 
 /**
  * Vars
@@ -41,6 +42,8 @@ class MarkusCMS
 	private $twig;
 	// YAML Parser
 	private $yml;
+	// YAML Dumper
+	private $dumper;
 	
 	function __construct()
 	{
@@ -51,9 +54,10 @@ class MarkusCMS
 		$this->config = $this->getConfig();
 
 		/**
-		 * YAML Parser
+		 * YAML Parser/Dumper
 		 */
 		$this->yml = new Parser();
+		$this->dumper = new Dumper();
 		
 		/**
 		 * Templating Engine
@@ -148,18 +152,44 @@ class MarkusCMS
 			});
 
 			$router->post('/edit', function() {
+				$messages = array();
 				$path = $this->config->app_path . '/';
 				$old_file = $_POST['old_file'];
 				$filename = $_POST['filename'];
-				$contents = $_POST['contents'];
+				$contents = (isset($_POST['contents'])) ? $_POST['contents'] : '';
+				$fields = (isset($_POST['fields'])) ? $_POST['fields'] : '';
 
 				// Rename file if it doesnt exist
 				if ( $old_file != $filename ) {
-					$this->filesystem->rename($path . $old_file, $path . $filename);
+					$renamed = $this->filesystem->rename($path . $old_file, $path . $filename);
+
+					// Add message
+					if ($renamed) {
+						$messages['renamed'] = 'File name change succesfully';
+					}
 				}
 
-				// Update it's contents
-				$this->filesystem->update($path . $filename, $contents);
+				// Save fields if any
+				if (!empty($fields)) {
+					$ymlStr = $this->dumper->dump($fields, 2);
+					$updated = $this->filesystem->update($path . $filename, $ymlStr);
+
+					// Add message
+					if ($updated) {
+						$message['messages'] = 'All messages updated successfully';
+					}
+				}
+
+				// Save contents if any
+				if (!empty($contents)) {
+					$this->filesystem->update($path . $filename, $contents);
+					$messages['contents'] = 'File contents updated succesfully';
+				}
+
+				echo '<pre>';
+				print_r($messages);
+				echo '</pre>';
+				// echo json_encode($messages);
 
 			});
 
