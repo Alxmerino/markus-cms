@@ -5,6 +5,7 @@ use Phroute\Dispatcher as Dispatcher;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local as Adapter;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Exception\ParseException;
 
 /**
  * Vars
@@ -101,30 +102,44 @@ class MarkusCMS
 			});
 
 			$router->get('/edit/{filename:c}', function($filename) {
+				
 				// File Data
 				$data = array();
+				$data['error'] = '';
+
+				// Valid extensions
 				$markdownExtensions = array("mark", "markdown", "md", "mdml", "mdown", "mdtext", "mdtxt", "mdwn", "mkd", "mkdn");
 				$yamlExtensions = array("yaml", "yml");
 
 				// File contents
 				$fileContents = $this->filesystem->read($this->config->app_path . '/' . $filename);
+				$data['filename'] = $filename;
 
 				// Get file info
 				$fileInfo = pathinfo($this->config->app_path . '/' . $filename);
 	
+				// Let's see if the file is a valid extension
 				if ( in_array($fileInfo['extension'], $markdownExtensions) !== FALSE
 					|| in_array($fileInfo['extension'], $yamlExtensions) !== FALSE ) {
 
+					// Lets try regular yaml
 					try {
-						echo '<pre>';
-						print_r($this->yml->parse($fileContents));
-						echo '</pre>';
+
+						$data['fields'] = array();
+						$fields = $this->yml->parse($fileContents);
+
+						foreach ($fields as $key => $value) {
+							$data['fields'][$key] = $value;
+						}
+
 					} catch (ParseException $e) {
-						printf("Unable to parse the YAML string: %s", $e->getMessage());
+						// Let's do some jekyll like here
+						// echo '<pre>';
+						// 	print_r(explode(PHP_EOL . '---', $fileContents));
+						// echo '</pre>';
 					}
 
 				} else {
-					$data['filename'] = $filename;
 					$data['content'] = $fileContents;
 				}
 				$data['markus'] = $this->objToArray($this->config->settings);
