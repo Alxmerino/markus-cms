@@ -176,7 +176,7 @@ class MarkusCMS
 
 					// Add message
 					if ($updated) {
-						$message['messages'] = 'All messages updated successfully';
+						$messages['fields'] = 'All fields updated successfully';
 					}
 				}
 
@@ -185,11 +185,8 @@ class MarkusCMS
 					$this->filesystem->update($path . $filename, $contents);
 					$messages['contents'] = 'File contents updated succesfully';
 				}
-
-				echo '<pre>';
-				print_r($messages);
-				echo '</pre>';
-				// echo json_encode($messages);
+				
+				echo json_encode($messages);
 
 			});
 
