@@ -124,30 +124,35 @@ class MarkusCMS
 				// Get file info
 				$fileInfo = pathinfo($this->config->app_path . '/' . $filename);
 	
-				// Let's see if the file is a valid extension
-				if ( $yamlMode && (in_array($fileInfo['extension'], $markdownExtensions) !== FALSE
-					 || in_array($fileInfo['extension'], $yamlExtensions) !== FALSE) ) {
+				if ($yamlMode) {
+					// Let's see if the file is a valid extension and YAML mode
+					if ( in_array($fileInfo['extension'], $markdownExtensions) !== FALSE
+						|| in_array($fileInfo['extension'], $yamlExtensions) !== FALSE ) {
 
 					// Lets try regular yaml
-					try {
+						try {
 
-						$data['fields'] = array();
-						$fields = $this->yml->parse($fileContents);
+							$data['fields'] = array();
+							$fields = $this->yml->parse($fileContents);
 
-						foreach ($fields as $key => $value) {
-							$data['fields'][$key] = $value;
-						}
+							foreach ($fields as $key => $value) {
+								$data['fields'][$key] = $value;
+							}
 
-					} catch (ParseException $e) {
+						} catch (ParseException $e) {
 						// Let's do some jekyll like here
 						// echo '<pre>';
 						// 	print_r(explode(PHP_EOL . '---', $fileContents));
 						// echo '</pre>';
+						}
+					} else {
+						// @TODO Message: Yaml mode but file not supported
+						$data['content'] = $fileContents;
 					}
-
 				} else {
 					$data['content'] = $fileContents;
 				}
+
 				$data['markus'] = $this->objToArray($this->config->settings);
 					
 				return $this->twig->render('edit.html', $data);
