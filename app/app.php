@@ -106,6 +106,8 @@ class MarkusCMS
 			});
 
 			$router->get('/edit/{filename:c}', function($filename) {
+				// Yaml Editing
+				$yamlMode = (isset($_GET['mode']) && $_GET['mode'] === 'yaml') ? true : false;
 				
 				// File Data
 				$data = array();
@@ -123,8 +125,8 @@ class MarkusCMS
 				$fileInfo = pathinfo($this->config->app_path . '/' . $filename);
 	
 				// Let's see if the file is a valid extension
-				if ( in_array($fileInfo['extension'], $markdownExtensions) !== FALSE
-					|| in_array($fileInfo['extension'], $yamlExtensions) !== FALSE ) {
+				if ( $yamlMode && (in_array($fileInfo['extension'], $markdownExtensions) !== FALSE
+					 || in_array($fileInfo['extension'], $yamlExtensions) !== FALSE) ) {
 
 					// Lets try regular yaml
 					try {
@@ -185,7 +187,7 @@ class MarkusCMS
 					$this->filesystem->update($path . $filename, $contents);
 					$messages['contents'] = 'File contents updated succesfully';
 				}
-				
+
 				echo json_encode($messages);
 
 			});
