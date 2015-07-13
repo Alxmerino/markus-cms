@@ -38,11 +38,11 @@ class MarkusCMS
 	private $filesystem;
 	// @array CMS config
 	private $config;
-	// Twig instance
+	// @var Twig instance
 	private $twig;
-	// YAML Parser
+	// @var YAML Parser
 	private $yml;
-	// YAML Dumper
+	// @var YAML Dumper
 	private $dumper;
 	
 	function __construct()
@@ -125,11 +125,12 @@ class MarkusCMS
 				$fileInfo = pathinfo($this->config->app_path . '/' . $filename);
 	
 				if ($yamlMode) {
-					// Let's see if the file is a valid extension and YAML mode
+					/* Let's see if the file is a 
+					   valid extension and YAML mode */
 					if ( in_array($fileInfo['extension'], $markdownExtensions) !== FALSE
 						|| in_array($fileInfo['extension'], $yamlExtensions) !== FALSE ) {
 
-					// Lets try regular yaml
+						// Lets try regular yaml
 						try {
 
 							$data['fields'] = array();
@@ -140,10 +141,19 @@ class MarkusCMS
 							}
 
 						} catch (ParseException $e) {
-						// Let's do some jekyll like here
-						// echo '<pre>';
-						// 	print_r(explode(PHP_EOL . '---', $fileContents));
-						// echo '</pre>';
+							// Let's do some jekyll like here
+							$fileDataArray = explode('---', $fileContents);
+
+							// Filter contents
+							$fileDataArray = array_filter($fileDataArray);
+							$fields = $this->yml->parse($fileDataArray[1]);
+
+							foreach ($fields as $key => $value) {
+								$data['fields'][$key] = $value;
+							}
+
+							$data['content'] = $fileDataArray[2];
+
 						}
 					} else {
 						// @TODO Message: Yaml mode but file not supported
