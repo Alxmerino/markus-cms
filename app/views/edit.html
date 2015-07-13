@@ -9,6 +9,9 @@
 
 		<form method="post" action="/edit">
 			<input type="hidden" name="old_file" value="{{ filename }}">
+			{% if jekyll %}
+				<input type="hidden" name="jekyll" value="{{ jekyll }}">
+			{% endif %}
 			<div class="row uniform 50%">
 				<div class="12u$ 12u$(xsmall) name">
 					<input type="text" name="filename" id="filename" value="{{ filename }}" />

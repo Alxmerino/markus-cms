@@ -141,6 +141,8 @@ class MarkusCMS
 							}
 
 						} catch (ParseException $e) {
+							$data['jekyll'] = true;
+
 							// Let's do some jekyll like here
 							$fileDataArray = explode('---', $fileContents);
 
@@ -170,9 +172,11 @@ class MarkusCMS
 
 			$router->post('/edit', function() {
 				$messages = array();
+				$jekyllData = array();
 				$path = $this->config->app_path . '/';
 				$old_file = $_POST['old_file'];
 				$filename = $_POST['filename'];
+				$jekyll = $_POST['jekyll'];
 				$contents = (isset($_POST['contents'])) ? $_POST['contents'] : '';
 				$fields = (isset($_POST['fields'])) ? $_POST['fields'] : '';
 
@@ -189,18 +193,37 @@ class MarkusCMS
 				// Save fields if any
 				if (!empty($fields)) {
 					$ymlStr = $this->dumper->dump($fields, 2);
-					$updated = $this->filesystem->update($path . $filename, $ymlStr);
 
-					// Add message
-					if ($updated) {
-						$messages['fields'] = 'All fields updated successfully';
+					// Jekyll mode
+					if ($jekyll == true) {
+						$jekyllData[] = $ymlStr;
+					} else {
+						// Update the file
+						$updated = $this->filesystem->update($path . $filename, $ymlStr);
+						// Add message
+						if ($updated) {
+							$messages['fields'] = 'All fields updated successfully';
+						}
 					}
+
 				}
 
 				// Save contents if any
 				if (!empty($contents)) {
-					$this->filesystem->update($path . $filename, $contents);
-					$messages['contents'] = 'File contents updated succesfully';
+					// Jekyll mode
+					if ($jekyll == true) {
+						$jekyllData[] = $contents;
+					} else {
+						$this->filesystem->update($path . $filename, $contents);
+						$messages['contents'] = 'File contents updated succesfully';
+					}
+				}
+
+				if (!empty($jekyllData)) {
+					// Glue the data
+					$jekyllData = implode("---", $jekyllData);
+					$this->filesystem->update($path . $filename, $jekyllData);
+					$messages['contents'] = 'Fields and content updated succesfully';
 				}
 
 				echo json_encode($messages);
